@@ -1,10 +1,10 @@
 #include <SocketIoClient.h>
 
-const String getEventName(const String msg) {
+const String getEventName(const String &msg) {
 	return msg.substring(4, msg.indexOf("\"",4));
 }
 
-const String getEventPayload(const String msg) {
+const String getEventPayload(const String &msg) {
 	String result = msg.substring(msg.indexOf("\"",4)+2,msg.length()-1);
 	if(result.startsWith("\"")) {
 		result.remove(0,1);
@@ -16,7 +16,6 @@ const String getEventPayload(const String msg) {
 }
 
 void SocketIoClient::webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
-	String msg;
 	switch(type) {
 		case WStype_DISCONNECTED:
 			SOCKETIOCLIENT_DEBUG("[SIoC] Disconnected!\n");
@@ -25,20 +24,22 @@ void SocketIoClient::webSocketEvent(WStype_t type, uint8_t * payload, size_t len
 			SOCKETIOCLIENT_DEBUG("[SIoC] Connected to url: %s\n",  payload);
 			break;
 		case WStype_TEXT:
-			msg = String((char*)payload);
-			if(msg.startsWith("42")) {
-				trigger(getEventName(msg).c_str(), getEventPayload(msg).c_str(), length);
-			} else if(msg.startsWith("2")) {
-				_webSocket.sendTXT("3");
-			} else if(msg.startsWith("40")) {
-				trigger("connect", NULL, 0);
-			} else if(msg.startsWith("41")) {
-				trigger("disconnect", NULL, 0);
+			{
+				String msg((char*)payload);
+				if(msg.startsWith("42")) {
+					trigger(getEventName(msg).c_str(), getEventPayload(msg).c_str(), length);
+				} else if(msg.startsWith("2")) {
+					_webSocket.sendTXT("3");
+				} else if(msg.startsWith("40")) {
+					trigger("connect", NULL, 0);
+				} else if(msg.startsWith("41")) {
+					trigger("disconnect", NULL, 0);
+				}
 			}
 			break;
 		case WStype_BIN:
 			SOCKETIOCLIENT_DEBUG("[SIoC] get binary length: %u\n", length);
-			hexdump(payload, length);
+			//hexdump(payload, length);
 		break;
 	}
 }
