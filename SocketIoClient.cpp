@@ -38,7 +38,7 @@ void SocketIoClient::webSocketEvent(WStype_t type, uint8_t * payload, size_t len
 			break;
 		case WStype_BIN:
 			SOCKETIOCLIENT_DEBUG("[SIoC] get binary length: %u\n", length);
-			hexdump(payload, length);
+			//hexdump(payload, length);
 		break;
 	}
 }
